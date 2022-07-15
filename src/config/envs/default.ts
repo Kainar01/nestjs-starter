@@ -19,4 +19,7 @@ export const config: AppConfig = {
     port: 3000,
     cors: false,
   },
+  redis: {
+    url: process.env.REDIS_URL || 'redis://localhost:6379',
+  },
 };

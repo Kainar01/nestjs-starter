@@ -53,6 +53,14 @@ export class AuthService {
     return Number(payload.sub) === data.userId;
   }
 
+  public validateJwtToken(token: string): JwtPayload | null {
+    try {
+      return this.jwt.verify<JwtPayload>(token);
+    } catch (er) {
+      return null;
+    }
+  }
+
   public jwtSign(data: Payload): JwtSign {
     const payload: JwtPayload = { sub: data.userId, username: data.username, role: data.role };
 

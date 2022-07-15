@@ -15,6 +15,8 @@ export declare global {
       DB_PASSWORD: string;
       DB_NAME: string;
 
+      REDIS_URL: string;
+
       JWT_SECRET: string;
       JWT_REFRESH_SECRET: string;
     }

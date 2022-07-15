@@ -4,7 +4,8 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 
 import { middleware } from './app.middleware';
 import { AppModule } from './app.module';
-import { Logger } from './common';
+import { ConfigService, Logger } from './common';
+import { RedisIoAdapter } from './modules/chat/adapters/redis.adapter';
 
 /**
  * https://docs.nestjs.com
@@ -22,9 +23,15 @@ async function bootstrap(): Promise<string> {
   if (isProduction) {
     app.enable('trust proxy');
   }
-
   // Express Middleware
   middleware(app);
+
+  const config: ConfigService = await app.resolve(ConfigService);
+
+  const redisIoAdapter = new RedisIoAdapter(app);
+  await redisIoAdapter.connectToRedis(config.get('redis'));
+
+  app.useWebSocketAdapter(redisIoAdapter);
 
   await app.listen(process.env.PORT || 3000);
 

@@ -23,4 +23,7 @@ export type AppConfig = {
     jwtRefreshExpiration: number | string;
     cookieSecure: boolean;
   };
+  redis: {
+    url: string;
+  };
 };
