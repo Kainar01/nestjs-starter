@@ -7,6 +7,7 @@ import type { ValidationError } from 'class-validator';
 import { CommonModule, LoggerMiddleware } from './common';
 import { configuration, validateEnv } from './config';
 import { AuthModule } from './modules';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AuthModule } from './modules';
     // Service Modules
     CommonModule, // Global
     AuthModule,
+    ChatModule,
     // Module Router
     // https://docs.nestjs.com/recipes/router-module
     RouterModule.register([]),
