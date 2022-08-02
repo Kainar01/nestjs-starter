@@ -1,6 +1,7 @@
 import { BadRequestException, MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE, RouterModule } from '@nestjs/core';
+import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import type { ValidationError } from 'class-validator';
 
@@ -23,6 +24,12 @@ import { ChatModule } from './modules/chat/chat.module';
     TypeOrmModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         ...await config.get('db'),
+      }),
+      inject: [ConfigService],
+    }),
+    MongooseModule.forRootAsync({
+      useFactory: async (config: ConfigService) => ({
+        ...({ uri: await config.get('mongodb.url') }),
       }),
       inject: [ConfigService],
     }),
