@@ -19,4 +19,10 @@ export const config: AppConfig = {
     port: 3000,
     cors: false,
   },
+  redis: {
+    url: process.env.REDIS_URL,
+  },
+  mongodb: {
+    url: process.env.MONGO_DB_URL,
+  },
 };

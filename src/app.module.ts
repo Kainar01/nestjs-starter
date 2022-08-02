@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import type { ValidationError } from 'class-validator';
 
 import { CommonModule, LoggerMiddleware } from './common';
-import { configuration } from './config';
+import { configuration, validateEnv } from './config';
 import { AuthModule } from './modules';
 
 @Module({
@@ -15,6 +15,7 @@ import { AuthModule } from './modules';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
+      validate: validateEnv,
     }),
     // Database
     // https://docs.nestjs.com/techniques/database
