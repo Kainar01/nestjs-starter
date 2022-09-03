@@ -7,17 +7,20 @@ export class UserEntity implements User {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id!: number;
 
-  @Column('varchar', { nullable: false, name: 'name' })
-  name!: string;
+  @Column('varchar', { nullable: false, name: 'chatId' })
+  chatId!: string;
 
-  @Column('varchar', { nullable: false, name: 'username' })
-  username!: string;
+  @Column('varchar', { nullable: true, name: 'name' })
+  name!: string | null;
+
+  @Column('varchar', { nullable: true, name: 'username' })
+  username!: string | null;
 
   @Column({ type: 'enum', enum: UserRole, nullable: true, name: 'role' })
   role!: UserRole | null;
 
-  @Column('varchar', { nullable: false, name: 'password' })
-  password!: string;
+  @Column('varchar', { nullable: true, name: 'password' })
+  password!: string | null;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;

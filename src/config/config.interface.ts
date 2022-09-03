@@ -23,6 +23,9 @@ export type AppConfig = {
     jwtRefreshExpiration: number | string;
     cookieSecure: boolean;
   };
+  bot: {
+    token: string;
+  };
   redis: {
     url: string;
   };
@@ -49,4 +52,5 @@ export type AppEnvVars = {
   REDIS_URL: string;
   JWT_SECRET: string;
   JWT_REFRESH_SECRET: string;
+  TELEGRAM_TOKEN: string;
 };

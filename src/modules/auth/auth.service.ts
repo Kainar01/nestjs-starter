@@ -26,7 +26,7 @@ export class AuthService {
     if (exists) throw new BadRequestException('Username already exists');
 
     const user = this.userRepository.create(dto);
-    user.password = await this.hashPassword(user.password);
+    if (user.password) { user.password = await this.hashPassword(user.password); }
 
     await this.userRepository.save(user);
 
@@ -36,7 +36,7 @@ export class AuthService {
   public async validateUser(username: string, password: string): Promise<Omit<UserEntity, 'password'> | null> {
     const user = await this.user.findByUsername(username);
 
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (user?.password && (await bcrypt.compare(password, user.password))) {
       const { password: pass, ...result } = user;
       return result;
     }

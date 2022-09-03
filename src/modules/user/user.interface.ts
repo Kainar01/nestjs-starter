@@ -1,11 +1,13 @@
 export interface User {
   id: number;
-  name: string;
-  username: string;
-  password: string;
+  chatId: string;
+  name: string | null;
+  username: string | null;
+  password: string | null;
   role: UserRole | null;
 }
 
 export enum UserRole {
   ADMIN = 'admin',
+  SUPERADMIN = 'superadmin',
 }

@@ -1,3 +1,5 @@
+import { Scenes } from 'telegraf';
+
 import type { AppEnvVars } from '@/config';
 
 import { Payload } from '../src/modules/auth';
@@ -16,5 +18,11 @@ export declare global {
     }
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
     interface User extends Payload {}
+  }
+
+  namespace Telegraf {
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    interface Context extends Scenes.SceneContext {}
   }
 }

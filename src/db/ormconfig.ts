@@ -2,10 +2,10 @@
 /// <reference types="../../typings/global" />
 import * as dotenv from 'dotenv';
 import { DataSource, DataSourceOptions, InstanceChecker } from 'typeorm';
-
+import path from 'path';
 import { configuration } from '../config';
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 //#region typeorm hack
 // https://github.com/typeorm/typeorm/issues/8914#issuecomment-1152603148
@@ -22,7 +22,7 @@ patchAsyncDataSourceSetup();
 //#endregion
 
 const ormconfig = async (): Promise<DataSource> => {
-  const config = <{ db: DataSourceOptions }> await configuration();
+  const config = <{ db: DataSourceOptions }>await configuration();
 
   return new DataSource(config.db);
 };

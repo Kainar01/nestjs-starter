@@ -19,6 +19,9 @@ export const config: AppConfig = {
     port: 3000,
     cors: false,
   },
+  bot: {
+    token: process.env.TELEGRAM_TOKEN,
+  },
   redis: {
     url: process.env.REDIS_URL,
   },

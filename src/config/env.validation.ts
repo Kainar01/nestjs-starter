@@ -44,6 +44,10 @@ class EnvironmentVariables implements AppEnvVars {
   @IsString()
   @IsNotEmpty()
   JWT_REFRESH_SECRET!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  TELEGRAM_TOKEN!: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
