@@ -9,7 +9,7 @@ import { BotUpdate } from './bot.update';
 import { CourseEntity, TaskEntity } from './entities';
 import { sessionMiddleware } from './middlewares/session.middleware';
 import { InitScene } from './scenes/init/init.scene';
-import { CourseService } from './services';
+import { AssignmentService, CourseService, DriverService, MoodleService } from './services';
 
 @Module({
   imports: [
@@ -27,7 +27,7 @@ import { CourseService } from './services';
     ]),
     UserModule,
   ],
-  providers: [BotUpdate, InitScene, CourseService],
+  providers: [BotUpdate, InitScene, CourseService, MoodleService, DriverService, AssignmentService],
   exports: [],
 })
 export class BotModule {}

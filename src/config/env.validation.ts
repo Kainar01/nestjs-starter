@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsNumberString, IsString, validateSync } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumberString, IsString, IsUrl, validateSync } from 'class-validator';
 import { AppEnv, AppEnvVars } from './config.interface';
 
 class EnvironmentVariables implements AppEnvVars {
@@ -48,6 +48,10 @@ class EnvironmentVariables implements AppEnvVars {
   @IsString()
   @IsNotEmpty()
   TELEGRAM_TOKEN!: string;
+
+  @IsUrl()
+  @IsNotEmpty()
+  BOT_MOODLE_URL!: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

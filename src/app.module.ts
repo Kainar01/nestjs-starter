@@ -1,8 +1,11 @@
+import path from 'path';
+
 import { BadRequestException, MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE, RouterModule } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import type { ValidationError } from 'class-validator';
+import { I18nModule } from 'nestjs-i18n';
 
 import { CommonModule, LoggerMiddleware } from './common';
 import { configuration, validateEnv } from './config';
@@ -17,11 +20,20 @@ import { AuthModule, BotModule, UserModule } from './modules';
       load: [configuration],
       validate: validateEnv,
     }),
+    // I18n
+    I18nModule.forRoot({
+      fallbackLanguage: 'ru',
+      loaderOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      resolvers: [],
+    }),
     // Database
     // https://docs.nestjs.com/techniques/database
     TypeOrmModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
-        ...await config.get('db'),
+        ...(await config.get('db')),
       }),
       inject: [ConfigService],
     }),

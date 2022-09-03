@@ -1,0 +1,6 @@
+{
+  "error": "Не смогли достать ассайнменты\n\nОшибка: {error}",
+  "deadline_with_days": "Осталось: дней {days}, часов {hours}",
+  "deadline_with_hours": "Осталось: часов {hours}, минут {minutes}",
+  "deadline_with_minutes": "Осталось: минут {minutes}"
+}

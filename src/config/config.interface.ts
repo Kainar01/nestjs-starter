@@ -25,6 +25,9 @@ export type AppConfig = {
   };
   bot: {
     token: string;
+    moodle: {
+      url: string;
+    };
   };
   redis: {
     url: string;
@@ -53,4 +56,5 @@ export type AppEnvVars = {
   JWT_SECRET: string;
   JWT_REFRESH_SECRET: string;
   TELEGRAM_TOKEN: string;
+  BOT_MOODLE_URL: string;
 };

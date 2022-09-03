@@ -21,6 +21,9 @@ export const config: AppConfig = {
   },
   bot: {
     token: process.env.TELEGRAM_TOKEN,
+    moodle: {
+      url: process.env.BOT_MOODLE_URL,
+    },
   },
   redis: {
     url: process.env.REDIS_URL,
