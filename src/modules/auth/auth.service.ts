@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import type { Response } from 'express';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import type { Repository } from 'typeorm';
 
 import { ConfigService } from '@/common';

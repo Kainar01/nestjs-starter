@@ -2,14 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository, UpdateResult } from 'typeorm';
 
-import type { UpdateUserDto } from './dto';
-import type { CreateUserDto } from './dto/create-user.dto';
-import { UserEntity } from './user.entity';
-import type { User } from './user.interface';
+import type { UpdateUserDto } from '../dto';
+import type { CreateUserDto } from '../dto/create-user.dto';
+import { UserEntity } from '../entities';
+import { ScheduleHour, User } from '../interfaces';
+import { UserScheduleService } from './user-schedule.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>) {}
+  constructor(
+    private userScheduleService: UserScheduleService,
+    @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
+  ) {}
 
   public async findByUsername(username: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({ where: { username } });
@@ -19,9 +23,20 @@ export class UserService {
     return this.userRepository.findOne({ where: { chatId } });
   }
 
+  public async findByUserId(userId: number): Promise<UserEntity | null> {
+    return this.userRepository.findOne({ where: { id: userId } });
+  }
+
   public async createUser(dto: CreateUserDto): Promise<UserEntity> {
     const user = this.userRepository.create(dto);
-    return this.userRepository.save(user);
+
+    await this.userRepository.save(user);
+
+    const defaultUserScheduleHours = [ScheduleHour.$8, ScheduleHour.$18];
+
+    await this.userScheduleService.updateUserSchedule(user.id, defaultUserScheduleHours);
+
+    return user;
   }
 
   public async updateUser(id: number, dto: UpdateUserDto): Promise<User> {

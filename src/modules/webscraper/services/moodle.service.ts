@@ -2,7 +2,7 @@ import { URL } from 'url';
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { WebDriver, By } from 'selenium-webdriver';
 
 @Injectable()
@@ -98,7 +98,7 @@ export class MoodleService {
       // if not error, success
       return { error: null };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { error: (<Error>err).message };
     }
   }

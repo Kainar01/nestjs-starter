@@ -1,16 +1,16 @@
 import { UseFilters, UseGuards } from '@nestjs/common';
 import { I18n, I18nService } from 'nestjs-i18n';
-import { Update, InjectBot, On, Start, Command, Ctx, Message } from 'nestjs-telegraf';
+import { Update, InjectBot, On, Start, Command, Ctx } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
 
 import { TelegrafExceptionFilter } from '@/common/filters';
+import { AssignmentService } from '@/modules/assignment';
 
 import { User, UserService } from '../user';
 import { MOODLE_BOT_NAME, MOODLE_BOT_SCENES, TELEGRAM_EMOJIES } from './bot.constants';
 import { CtxUser } from './decorators';
 import { BotAdminGuard } from './guards';
 import type { BotContext } from './interfaces';
-import { AssignmentService } from './services';
 
 @Update()
 @UseFilters(TelegrafExceptionFilter)
@@ -57,19 +57,25 @@ export class BotUpdate {
   }
 
   @Command('assignments')
-  public async onAssignmentsCommand(@Ctx() ctx: BotContext, @CtxUser() user: User): Promise<string | void> {
-    const { assignments, error } = await this.assignmentService.getFormattedAssignments(user);
+  public async onAssignmentsCommand(@CtxUser() user: User): Promise<string | void> {
+    const { error } = this.assignmentService.validateUserLastNotification(user);
 
-    if (error) {
-      return this.getMessage('assignments.error', { error });
-    }
+    if (error) return `${error} ${TELEGRAM_EMOJIES.FOLDED_HANDS}`;
 
-    await ctx.reply(assignments, { parse_mode: 'Markdown' });
+    await this.assignmentService.scheduleAssignmentNotification(user);
+    const message = this.getMessage('assignments.job.scheduled');
+    return `${message} ${TELEGRAM_EMOJIES.HALO}`;
+  }
+
+  @Command('schedule')
+  public async onScheduleCommand(@Ctx() ctx: BotContext): Promise<string | void> {
+    await ctx.scene.enter(MOODLE_BOT_SCENES.SCHEDULE);
   }
 
   @On('text')
-  public onMessage(@Message('text') text: string): string {
-    return `message from root scene ${text}`;
+  public onMessage(): string {
+    const message = this.getMessage('bot.wish');
+    return `${message} ${TELEGRAM_EMOJIES.HALO}`;
   }
 
   private useUserMiddleware(): void {

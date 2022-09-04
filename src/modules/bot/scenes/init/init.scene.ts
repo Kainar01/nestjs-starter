@@ -5,13 +5,13 @@ import type { WebDriver } from 'selenium-webdriver';
 import type { Scenes } from 'telegraf';
 
 import { TelegrafExceptionFilter } from '@/common/filters';
-import { User, UserService } from '@/modules/user';
+import { Schedule, User, UserScheduleService, UserService } from '@/modules/user';
+import { DriverService, MoodleService } from '@/modules/webscraper/services';
 
 import { MOODLE_BOT_SCENES, TELEGRAM_EMOJIES } from '../../bot.constants';
 import { CtxUser } from '../../decorators';
-import { BotInitActions } from '../../interfaces';
-import { DriverService, MoodleService } from '../../services';
 import { INIT_STEPS } from './init.constants';
+import { BotInitActions } from './init.interface';
 
 @Wizard(MOODLE_BOT_SCENES.INIT)
 @UseFilters(TelegrafExceptionFilter)
@@ -21,6 +21,7 @@ export class InitScene {
     @I18n() private i18n: I18nService,
     private driverService: DriverService,
     private moodle: MoodleService,
+    private userScheduleService: UserScheduleService,
   ) {}
 
   private get commonMessages() {
@@ -130,10 +131,7 @@ export class InitScene {
   }
 
   @Action(new RegExp(`${BotInitActions.USERNAME_SKIP}`))
-  public async handleUsernameSkip(
-  @Ctx() ctx: Scenes.WizardContext,
-    @Next() next: () => Promise<void>,
-  ) {
+  public async handleUsernameSkip(@Ctx() ctx: Scenes.WizardContext, @Next() next: () => Promise<void>) {
     const callbackMessage = this.getCallbackMessage(ctx);
 
     await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
@@ -183,8 +181,12 @@ export class InitScene {
 
   @Action(new RegExp(`${BotInitActions.DATA_CONFIRM}`))
   public async handleDataConfirm(@Ctx() ctx: Scenes.WizardContext, @Next() next: () => Promise<void>, @CtxUser() user: User) {
+    // get users schedules
+    const schedules = await this.userScheduleService.getSchedulesByUserId(user.id);
+    const formattedSchedules = schedules.map(({ label }: Schedule) => label).join(', ');
+
     const callbackMessage = this.getCallbackMessage(ctx);
-    const credsMsg = this.getMessage<Record<string, string>>('authentication.save-credentials');
+    const credsMsg = this.getMessage<Record<string, string>>('authentication.save-credentials', { schedules: formattedSchedules });
 
     await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
     await ctx.editMessageText(`${callbackMessage} ${TELEGRAM_EMOJIES.CHECK_MARK}`, { parse_mode: 'Markdown' });
@@ -197,7 +199,7 @@ export class InitScene {
     if (!error) {
       await this.userService.updateUser(user.id, { username, password });
 
-      await ctx.reply(`${credsMsg['saved-credentials']} ${TELEGRAM_EMOJIES.RAISING_HANDS}`);
+      await ctx.reply(`${credsMsg['saved-credentials']} ${TELEGRAM_EMOJIES.CLOCK}`, { parse_mode: 'Markdown' });
 
       await ctx.scene.leave();
     } else {
@@ -267,6 +269,6 @@ export class InitScene {
   }
 
   private getCallbackMessage(ctx: Scenes.WizardContext) {
-    return <string> (<any>ctx.callbackQuery).message.text;
+    return <string>(<any>ctx.callbackQuery).message.text;
   }
 }

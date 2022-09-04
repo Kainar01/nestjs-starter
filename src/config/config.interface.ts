@@ -24,9 +24,9 @@ export type AppConfig = {
     cookieSecure: boolean;
   };
   bot: {
-    token: string;
     moodle: {
       url: string;
+      token: string;
     };
   };
   redis: {
@@ -55,6 +55,7 @@ export type AppEnvVars = {
   REDIS_URL: string;
   JWT_SECRET: string;
   JWT_REFRESH_SECRET: string;
-  TELEGRAM_TOKEN: string;
   BOT_MOODLE_URL: string;
+  MOODLE_BOT_TOKEN: string;
+  APP_TIMEZONE: string;
 };

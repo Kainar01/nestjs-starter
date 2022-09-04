@@ -1,15 +1,22 @@
 import path from 'path';
 
+import { BullModule } from '@nestjs/bull';
 import { BadRequestException, MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE, RouterModule } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import type { ValidationError } from 'class-validator';
 import { I18nModule } from 'nestjs-i18n';
+import { TelegrafModule } from 'nestjs-telegraf';
 
 import { CommonModule, LoggerMiddleware } from './common';
 import { configuration, validateEnv } from './config';
 import { AuthModule, BotModule, UserModule } from './modules';
+import { AssignmentModule } from './modules/assignment';
+import { MOODLE_BOT_NAME } from './modules/bot';
+import { sessionMiddleware } from './modules/bot/middlewares';
+import { WebScraperModule } from './modules/webscraper';
 
 @Module({
   imports: [
@@ -29,6 +36,22 @@ import { AuthModule, BotModule, UserModule } from './modules';
       },
       resolvers: [],
     }),
+    ScheduleModule.forRoot(),
+    TelegrafModule.forRootAsync({
+      botName: MOODLE_BOT_NAME,
+      useFactory: async (config: ConfigService) => ({
+        token: <string> await config.get('bot.moodle.token'),
+        middlewares: [sessionMiddleware],
+        include: [BotModule],
+      }),
+      inject: [ConfigService],
+    }),
+    BullModule.forRootAsync({
+      useFactory: async (config: ConfigService) => ({
+        ...(await config.get('redis')),
+      }),
+      inject: [ConfigService],
+    }),
     // Database
     // https://docs.nestjs.com/techniques/database
     TypeOrmModule.forRootAsync({
@@ -39,6 +62,8 @@ import { AuthModule, BotModule, UserModule } from './modules';
     }),
     // Service Modules
     CommonModule, // Global
+    WebScraperModule,
+    AssignmentModule,
     AuthModule,
     UserModule,
     BotModule,

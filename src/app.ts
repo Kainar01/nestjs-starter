@@ -1,6 +1,7 @@
 import { Logger as NestLogger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import moment from 'moment-timezone';
 
 import { middleware } from './app.middleware';
 import { AppModule } from './app.module';
@@ -16,6 +17,8 @@ async function bootstrap(): Promise<string> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });
+
+  moment.tz.setDefault(process.env.APP_TIMEZONE);
 
   app.useLogger(await app.resolve(Logger));
 

@@ -5,6 +5,8 @@ export interface User {
   username: string | null;
   password: string | null;
   role: UserRole | null;
+  lastAssignmentNotification: Date | null;
+  lastAssignmentRequest: Date | null;
 }
 
 export enum UserRole {

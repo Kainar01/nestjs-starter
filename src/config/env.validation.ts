@@ -47,11 +47,15 @@ class EnvironmentVariables implements AppEnvVars {
 
   @IsString()
   @IsNotEmpty()
-  TELEGRAM_TOKEN!: string;
+  MOODLE_BOT_TOKEN!: string;
 
   @IsUrl()
   @IsNotEmpty()
   BOT_MOODLE_URL!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  APP_TIMEZONE!: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

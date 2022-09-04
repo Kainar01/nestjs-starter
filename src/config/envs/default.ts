@@ -20,9 +20,9 @@ export const config: AppConfig = {
     cors: false,
   },
   bot: {
-    token: process.env.TELEGRAM_TOKEN,
     moodle: {
       url: process.env.BOT_MOODLE_URL,
+      token: process.env.MOODLE_BOT_TOKEN,
     },
   },
   redis: {

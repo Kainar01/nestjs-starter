@@ -1,33 +1,23 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
-import { TelegrafModule } from 'nestjs-telegraf';
 
+import { AssignmentModule } from '../assignment';
 import { UserModule } from '../user';
-import { MOODLE_BOT_NAME } from './bot.constants';
+import { WebScraperModule } from '../webscraper';
 import { BotUpdate } from './bot.update';
 import { CourseEntity, TaskEntity } from './entities';
-import { sessionMiddleware } from './middlewares/session.middleware';
 import { InitScene } from './scenes/init/init.scene';
-import { AssignmentService, CourseService, DriverService, MoodleService } from './services';
+import { ScheduleScene } from './scenes/schedule/schedule.scene';
+import { CourseService, MoodleBotService } from './services';
 
 @Module({
   imports: [
-    TelegrafModule.forRootAsync({
-      botName: MOODLE_BOT_NAME,
-      useFactory: async (config: ConfigService) => ({
-        token: <string> await config.get('bot.token'),
-        middlewares: [sessionMiddleware],
-        include: [BotModule],
-      }),
-      inject: [ConfigService],
-    }),
-    TypeOrmModule.forFeature([
-      CourseEntity, TaskEntity,
-    ]),
+    TypeOrmModule.forFeature([CourseEntity, TaskEntity]),
     UserModule,
+    WebScraperModule,
+    AssignmentModule,
   ],
-  providers: [BotUpdate, InitScene, CourseService, MoodleService, DriverService, AssignmentService],
-  exports: [],
+  providers: [BotUpdate, InitScene, ScheduleScene, CourseService, MoodleBotService],
+  exports: [MoodleBotService],
 })
 export class BotModule {}
