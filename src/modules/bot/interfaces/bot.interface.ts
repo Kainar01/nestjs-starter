@@ -6,8 +6,8 @@ export enum BotCommand {
   START = 'start',
   QUIT = 'quit',
   INIT = 'init',
-  LIST_TASKS = 'list-tasks',
-  RESCHEDULE = 'reschedule',
+  ASSIGNMENTS = 'assignments',
+  SCHEDULE = 'schedule',
 }
 
 export enum BotAction {

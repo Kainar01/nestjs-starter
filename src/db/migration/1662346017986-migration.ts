@@ -1,9 +1,8 @@
-import type { MigrationInterface, QueryRunner } from 'typeorm';
-
 import { ScheduleEntity } from '../../modules/user';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 import { scheduleSeed } from '../seed';
 
-export class migration1662281506283 implements MigrationInterface {
+export class migration1662346017986 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.manager.save(ScheduleEntity, scheduleSeed);
   }

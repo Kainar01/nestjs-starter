@@ -10,7 +10,7 @@ import { User, UserService } from '../user';
 import { MOODLE_BOT_NAME, MOODLE_BOT_SCENES, TELEGRAM_EMOJIES } from './bot.constants';
 import { CtxUser } from './decorators';
 import { BotAdminGuard } from './guards';
-import type { BotContext } from './interfaces';
+import { BotCommand, BotContext } from './interfaces';
 
 @Update()
 @UseFilters(TelegrafExceptionFilter)
@@ -51,12 +51,12 @@ export class BotUpdate {
     return 'Welcome judge';
   }
 
-  @Command('init')
+  @Command(BotCommand.INIT)
   public async onInitCommand(@Ctx() ctx: BotContext): Promise<void> {
     await ctx.scene.enter(MOODLE_BOT_SCENES.INIT);
   }
 
-  @Command('assignments')
+  @Command(BotCommand.ASSIGNMENTS)
   public async onAssignmentsCommand(@CtxUser() user: User): Promise<string | void> {
     const { error } = this.assignmentService.validateUserLastNotification(user);
 
@@ -67,7 +67,7 @@ export class BotUpdate {
     return `${message} ${TELEGRAM_EMOJIES.HALO}`;
   }
 
-  @Command('schedule')
+  @Command(BotCommand.SCHEDULE)
   public async onScheduleCommand(@Ctx() ctx: BotContext): Promise<string | void> {
     await ctx.scene.enter(MOODLE_BOT_SCENES.SCHEDULE);
   }
