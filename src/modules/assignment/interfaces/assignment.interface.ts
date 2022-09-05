@@ -1,21 +1,3 @@
-export interface MoodleAssignment {
-  title: string;
-  date: Date;
-  link: string;
-  courseTitle: string;
-  eventId: string;
-}
-
-export interface AssignmentListRO {
-  events?: MoodleAssignment[];
-  error: string | null;
-}
-
-export interface FormattedAssignmentListRO {
-  assignments: string;
-  error: string | null;
-}
-
 export enum AssignmentType {
   ASSIGNMENT = 'assignment',
   QUIZ = 'quiz',
@@ -29,11 +11,26 @@ export enum AssignmentStatus {
 
 export interface Assignment {
   id: number;
+  userId: number;
   assignmentId: string;
   title: string;
   type: AssignmentType;
+  status: AssignmentStatus;
   link: string;
   courseTitle: string;
   deadline: Date;
-  status: AssignmentStatus;
+}
+
+export interface AssignmentListRO {
+  assignments: Assignment[];
+  error: string | null;
+}
+
+export interface AssignmentFormatted extends Assignment {
+  formatted: string;
+}
+
+export interface AssignmentFormattedListRO {
+  assignments: AssignmentFormatted[];
+  error: string | null;
 }

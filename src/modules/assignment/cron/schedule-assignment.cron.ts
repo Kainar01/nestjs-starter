@@ -29,7 +29,8 @@ export class ScheduleAssignmentCron {
 
     await this.userScheduleRepository.manager.transaction(async (transactionEntityManager: EntityManager) => {
       // update cron last time to avoid recreating cron for same user
-      await this.userScheduleService.updateLastCron(users, transactionEntityManager);
+      const cronScheduledTime = moment().toDate();
+      await this.userScheduleService.updateLastCron(users, cronScheduledTime, transactionEntityManager);
 
       await users.reduce(async (prevPromise: Promise<number>, userId: number) => {
         await prevPromise;

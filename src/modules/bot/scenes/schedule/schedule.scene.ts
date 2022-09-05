@@ -9,19 +9,18 @@ import { User, UserScheduleService, Schedule } from '@/modules/user';
 
 import { MOODLE_BOT_SCENES, TELEGRAM_EMOJIES } from '../../bot.constants';
 import { CtxUser } from '../../decorators';
+import { BaseScene } from '../base/base.scene';
 import { BOT_SCHEDULE_ACTIONS, SCHEDULE_STEPS } from './schedule.constants';
 
 @Wizard(MOODLE_BOT_SCENES.SCHEDULE)
 @UseFilters(TelegrafExceptionFilter)
-export class ScheduleScene {
+export class ScheduleScene extends BaseScene {
   private MAX_SCHEDULES: number = 2;
   private SCHEDULES_KEY: string = 'schedules';
   private CURRENT_SCHEDULE_KEY: string = 'currentSchedule';
 
-  constructor(private userScheduleService: UserScheduleService, @I18n() private i18n: I18nService) {}
-
-  private get commonMessages() {
-    return this.getMessage<Record<string, string>>('common');
+  constructor(private userScheduleService: UserScheduleService, @I18n() i18n: I18nService) {
+    super(i18n);
   }
 
   @WizardStep(SCHEDULE_STEPS.SHOW_CURRENT_SCHEDULE)
@@ -183,36 +182,6 @@ export class ScheduleScene {
     this.setState(ctx, this.CURRENT_SCHEDULE_KEY, 0);
     // new schedules ctx
     this.setState(ctx, this.SCHEDULES_KEY, []);
-  }
-
-  private getMessage<T = string>(key: string, args?: Record<string, any>) {
-    return this.i18n.translate<T>(key, { args });
-  }
-
-  private getCallbackMessage(ctx: Scenes.WizardContext) {
-    return <string>(<any>ctx.callbackQuery).message.text;
-  }
-
-  private getCallbackData(ctx: Scenes.WizardContext) {
-    return <string>ctx.callbackQuery!.data;
-  }
-
-  private setState(ctx: Scenes.WizardContext, key: string, value: any) {
-    (<any>ctx).wizard.state[key] = value;
-  }
-
-  private getState<T = any>(ctx: Scenes.WizardContext) {
-    return <T>(<any>ctx).wizard.state;
-  }
-
-  private async runStep(ctx: Scenes.WizardContext, next: () => Promise<void>, newStep: number) {
-    const { step } = this.setStep(ctx, newStep);
-    if (typeof step === 'function') await step(ctx, next);
-  }
-
-  private setStep(ctx: Scenes.WizardContext, newStep: number) {
-    // set prev step, so the next running step will be current step
-    return ctx.wizard.selectStep(newStep - 1);
   }
 
   private getStateSchedules(ctx: Scenes.WizardContext) {

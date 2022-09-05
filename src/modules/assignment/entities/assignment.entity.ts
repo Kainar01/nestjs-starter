@@ -1,11 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { UserEntity } from '../../../modules/user';
+import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { Assignment, AssignmentStatus, AssignmentType } from '../interfaces';
 
-
 @Entity('assignment')
+@Unique(['userId', 'assignmentId'])
 export class AssignmentEntity implements Assignment {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id!: number;
+
+  @Column('int', { nullable: false, name: 'user_id' })
+  userId!: number;
 
   @Column('int', { nullable: false, name: 'assignment_id' })
   assignmentId!: string;
@@ -19,12 +23,19 @@ export class AssignmentEntity implements Assignment {
   @Column('varchar', { nullable: false, name: 'course_title' })
   courseTitle!: string;
 
-  @Column({ type: 'enum', enum: AssignmentStatus, nullable: false, name: 'status' })
+  @Column({ type: 'enum', enum: AssignmentStatus, nullable: false, default: AssignmentStatus.PENDING, name: 'status' })
   status!: AssignmentStatus;
 
-  @Column({ type: 'enum', enum: AssignmentType, nullable: false, name: 'type' })
+  @Column({ type: 'enum', enum: AssignmentType, nullable: false, default: AssignmentType.ASSIGNMENT, name: 'type' })
   type!: AssignmentType;
 
   @CreateDateColumn({ type: 'timestamp', nullable: false })
   deadline!: Date;
+
+  @ManyToOne(() => UserEntity, (user) => user.userSchedules, {
+    onDelete: 'CASCADE',
+    onUpdate: 'NO ACTION',
+  })
+  @JoinColumn({ name: 'user_id' })
+  public user!: UserEntity;
 }

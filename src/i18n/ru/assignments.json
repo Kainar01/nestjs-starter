@@ -10,5 +10,11 @@
   "deadline_with_minutes": "Осталось: минут {minutes}",
   "cooldown-wait": "Вы недавно получили ассайнменты, следующий запрос можно сделать через: {left}",
   "cooldown-minutes": "минут {minutes}, секунд {seconds}",
-  "cooldown-seconds": "секунд {seconds}"
+  "cooldown-seconds": "секунд {seconds}",
+  "no-assignments": "Нет ближайших ассайнментов",
+  "submitted": "Сабмитнул",
+  "hide": "Не показывать",
+  "notify": "Уведомить",
+  "submitted-assignment": "Вы сабмитнули ассайнмент *{title}*.\n\nВы больше не будете получать этот ассайнмент в уведомлении",
+  "hid-assignment": "Вы скрыли ассайнмент *{title}*.\n\nВы больше не будете получать этот ассайнмент в уведомлении"
 }

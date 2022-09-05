@@ -1,4 +1,4 @@
 export * from './assignment.module';
-export * from './assignment.interface';
+export * from './interfaces';
 export * from './services';
 export * from './assignment.constants';

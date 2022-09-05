@@ -10,22 +10,21 @@ import { DriverService, MoodleService } from '@/modules/webscraper/services';
 
 import { MOODLE_BOT_SCENES, TELEGRAM_EMOJIES } from '../../bot.constants';
 import { CtxUser } from '../../decorators';
+import { BaseScene } from '../base/base.scene';
 import { INIT_STEPS } from './init.constants';
 import { BotInitActions } from './init.interface';
 
 @Wizard(MOODLE_BOT_SCENES.INIT)
 @UseFilters(TelegrafExceptionFilter)
-export class InitScene {
+export class InitScene extends BaseScene {
   constructor(
     private userService: UserService,
-    @I18n() private i18n: I18nService,
+    @I18n()i18n: I18nService,
     private driverService: DriverService,
     private moodle: MoodleService,
     private userScheduleService: UserScheduleService,
-  ) {}
-
-  private get commonMessages() {
-    return this.getMessage<Record<string, string>>('common');
+  ) {
+    super(i18n);
   }
 
   @WizardStep(INIT_STEPS.USERNAME)
@@ -234,28 +233,6 @@ export class InitScene {
     return /^\w+(\.\w+)?$/.exec(username) !== null;
   }
 
-  private async runStep(ctx: Scenes.WizardContext, next: () => Promise<void>, newStep: number) {
-    const { step } = this.setStep(ctx, newStep);
-    if (typeof step === 'function') await step(ctx, next);
-  }
-
-  private setStep(ctx: Scenes.WizardContext, newStep: number) {
-    // set prev step, so the next running step will be current step
-    return ctx.wizard.selectStep(newStep - 1);
-  }
-
-  private getMessage<T = string>(key: string, args?: Record<string, any>) {
-    return this.i18n.translate<T>(key, { args });
-  }
-
-  private setState(ctx: Scenes.WizardContext, key: string, value: any) {
-    (<any>ctx).wizard.state[key] = value;
-  }
-
-  private getState<T = any>(ctx: Scenes.WizardContext) {
-    return <T>(<any>ctx).wizard.state;
-  }
-
   private async isValidCreds(username: string, password: string) {
     return this.driverService.withDriver(async (driver: WebDriver) => this.moodle.checkLogin(username, password, driver));
   }
@@ -266,9 +243,5 @@ export class InitScene {
       username: username || user.username,
       password: password || user.password,
     };
-  }
-
-  private getCallbackMessage(ctx: Scenes.WizardContext) {
-    return <string>(<any>ctx.callbackQuery).message.text;
   }
 }

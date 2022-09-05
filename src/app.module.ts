@@ -16,6 +16,7 @@ import { AuthModule, BotModule, UserModule } from './modules';
 import { AssignmentModule } from './modules/assignment';
 import { MOODLE_BOT_NAME } from './modules/bot';
 import { sessionMiddleware } from './modules/bot/middlewares';
+import { NotificationModule } from './modules/notification';
 import { WebScraperModule } from './modules/webscraper';
 
 @Module({
@@ -67,6 +68,7 @@ import { WebScraperModule } from './modules/webscraper';
     AuthModule,
     UserModule,
     BotModule,
+    NotificationModule,
     // Module Router
     // https://docs.nestjs.com/recipes/router-module
     RouterModule.register([]),

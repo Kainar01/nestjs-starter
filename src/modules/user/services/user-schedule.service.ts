@@ -4,7 +4,7 @@ import moment from 'moment-timezone';
 import type { EntityManager, Repository } from 'typeorm';
 
 import { ScheduleEntity, UserScheduleEntity } from '../entities';
-import type { Schedule, ScheduleHour } from '../interfaces';
+import type { Schedule, ScheduleHour, UserSchedule } from '../interfaces';
 
 @Injectable()
 export class UserScheduleService {
@@ -52,14 +52,14 @@ export class UserScheduleService {
     );
   }
 
-  public async updateLastCron(userIds: number[], transactionManager?: EntityManager) {
+  public async updateLastCron(userIds: number[], newCron: UserSchedule['lastCron'], transactionManager?: EntityManager) {
     let qb;
     if (transactionManager) {
       qb = transactionManager.createQueryBuilder(UserScheduleEntity, 'us');
     } else {
       qb = this.userScheduleRepository.createQueryBuilder();
     }
-    await qb.update().set({ lastCron: moment().toDate() }).where('user_id IN (:...userIds)', { userIds }).execute();
+    await qb.update().set({ lastCron: newCron }).where('user_id IN (:...userIds)', { userIds }).execute();
   }
 
   public async updateUserSchedule(userId: number, hours: number[]) {

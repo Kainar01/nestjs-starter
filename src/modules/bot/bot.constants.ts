@@ -3,6 +3,14 @@ export const MOODLE_BOT_NAME = 'moodle-bot';
 export const MOODLE_BOT_SCENES = {
   INIT: 'init',
   SCHEDULE: 'schedule',
+  NOTIFY_ASSIGNMENT: 'notify-assignment',
+};
+
+export const MOODLE_BOT_ACTIONS = {
+  ASSIGNMENT_SUBMIT: 'assignment:submit:',
+  ASSIGNMENT_HIDE: 'assignment:hide:',
+  ASSIGNMENT_NOTIFY_OPTIONS: 'assignment:notify-options:',
+  ASSIGNMENT_NOTIFY: 'assignment:notify:',
 };
 
 // https://apps.timwhitlock.info/emoji/tables/unicode
@@ -20,6 +28,7 @@ export const TELEGRAM_EMOJIES = {
   CONFUSED: '\u{1F615}',
   GRINNING: '\u{1F601}',
   WINKING: '\u{1F609}',
+  WINKING_AND_TONGUE: '\u{1F61C}',
   PLEASED: '\u{1F60A}',
   RAISING_HANDS: '\u{1F64C}',
   CHECK_MARK: '\u{2705}',
@@ -31,4 +40,5 @@ export const TELEGRAM_EMOJIES = {
   LINK: '\u{1F517}',
   LEDGER: '\u{1F4D2}',
   EDIT: '\u{1F4DD}',
+  NO_SEE_MONKEY: '\u{1F648}',
 };

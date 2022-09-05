@@ -8,7 +8,7 @@ export class TelegrafExceptionFilter implements ExceptionFilter {
   public async catch(exception: Error, host: ArgumentsHost): Promise<void> {
     const telegrafHost = TelegrafArgumentsHost.create(host);
     const ctx = telegrafHost.getContext<BotContext>();
-
+    console.error(exception);
     await ctx.replyWithHTML(`<b>Error</b>: ${exception.message}`);
   }
 }
