@@ -12,7 +12,7 @@ import { TelegrafModule } from 'nestjs-telegraf';
 
 import { CommonModule, LoggerMiddleware } from './common';
 import { configuration, validateEnv } from './config';
-import { AuthModule, BotModule, UserModule } from './modules';
+import { BotModule, UserModule } from './modules';
 import { AssignmentModule } from './modules/assignment';
 import { MOODLE_BOT_NAME } from './modules/bot';
 import { sessionMiddleware } from './modules/bot/middlewares';
@@ -66,7 +66,6 @@ import { WebScraperModule } from './modules/webscraper';
     CommonModule, // Global
     WebScraperModule,
     AssignmentModule,
-    AuthModule,
     UserModule,
     BotModule,
     NotificationModule,
