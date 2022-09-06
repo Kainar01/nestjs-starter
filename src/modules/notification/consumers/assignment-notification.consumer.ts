@@ -10,24 +10,33 @@ import { BotContext, MOODLE_BOT_ACTIONS, MOODLE_BOT_NAME, TELEGRAM_EMOJIES } fro
 
 import { NOTIFICATION_QUEUES } from '../constants';
 import type { NotifyAssignmentJobData } from '../interfaces';
+import { NotificationService } from '../services';
 
 @Processor(NOTIFICATION_QUEUES.NOTIFY_ASSIGNMENT)
 export class AssignmentNotificationConsumer {
   constructor(
     @I18n() private i18n: I18nService,
     private assignmentService: AssignmentService,
+    private notificationService: NotificationService,
     @InjectBot(MOODLE_BOT_NAME)
     private readonly bot: Telegraf<BotContext>,
   ) {}
 
   @Process()
   public async process(job: Job<NotifyAssignmentJobData>) {
-    const { chatId, assignmentId } = job.data;
+    const { notificationId } = job.data;
+    const notification = await this.notificationService.getNotificationById(notificationId);
+
+    if (!notification) {
+      throw new Error('Notification not found');
+    }
+
+    const { assignmentId, chatId } = notification;
 
     try {
       const assignment = await this.assignmentService.getAssignmentById(assignmentId);
 
-      if (!assignment) throw new Error(`Assignment does not exist by id ${job.data.assignmentId}`);
+      if (!assignment) throw new Error(`Assignment does not exist by id ${assignmentId}`);
 
       return await this.sendAssignment(chatId, assignment);
 
@@ -40,7 +49,7 @@ export class AssignmentNotificationConsumer {
 
   @OnQueueError()
   public onJobError(job: Job<NotifyAssignmentJobData>, error: Error) {
-    console.error(`assignment id = ${job.data.assignmentId}`, error);
+    console.error(`notification id = ${job.data.notificationId}`, error);
   }
 
   private async sendMessage(chatId: string, message: string, extra?: ExtraReplyMessage) {

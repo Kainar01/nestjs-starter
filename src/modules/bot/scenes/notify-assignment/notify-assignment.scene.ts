@@ -111,7 +111,7 @@ export class NotifyAssignmentScene extends BaseScene {
     const assignment = await this.assignmentService.getAssignmentById(Number(assignmentId));
 
     if (!assignment) {
-      throw new Error('Ассайнмент не существует');
+      throw new Error('Ассайнмент не существует, попробуйте заново');
     }
 
     await ctx.deleteMessage();
@@ -129,12 +129,14 @@ export class NotifyAssignmentScene extends BaseScene {
     await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
     await ctx.editMessageText(`${callbackMessage} ${TELEGRAM_EMOJIES.CHECK_MARK}`, { parse_mode: 'Markdown' });
 
-    await this.notificationService.scheduleAssignmentNotificationJob(
+    const { scheduledAt } = await this.notificationService.scheduleAssignmentNotificationJob(
       { chatId: user.chatId, assignmentId: this.getAssignmentId(ctx) },
       notificationHour,
     );
-    const message = this.getMessage('notification.confirmed', { hour: notificationHour });
-    await ctx.reply(`${message} ${TELEGRAM_EMOJIES.RELEIVED}`);
+
+    const message = this.getMessage('notification.confirmed', { date: moment(scheduledAt).calendar() });
+
+    await ctx.reply(`${message} ${TELEGRAM_EMOJIES.RELEIVED}`, { parse_mode: 'Markdown' });
 
     await ctx.scene.leave();
   }
@@ -172,7 +174,7 @@ export class NotifyAssignmentScene extends BaseScene {
 
   private getNotificationHours(deadline: Date) {
     const hoursLeft = moment(deadline).diff(moment(), 'hours');
-    return this.NOTIFICATION_HOURS.filter((hour: number) => hour < hoursLeft);
+    return this.NOTIFICATION_HOURS.filter((hour: number) => hour <= hoursLeft);
   }
 
   private getStateNotification(ctx: Scenes.WizardContext) {

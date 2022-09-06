@@ -20,7 +20,7 @@ export class ScheduleAssignmentCron {
     @InjectRepository(UserScheduleEntity) private userScheduleRepository: Repository<UserScheduleEntity>,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   public async scheduleShowAssignmentJobs() {
     const currentTimeHour = moment().hour();
     const users = await this.userScheduleService.getScheduledUsers(<ScheduleHour>currentTimeHour);

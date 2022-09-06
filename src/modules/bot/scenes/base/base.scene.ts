@@ -46,4 +46,8 @@ export class BaseScene {
     const callbackData = this.getCallbackData(ctx);
     return callbackData.replace(prefix, '');
   }
+
+  protected async leaveScene(ctx: Scenes.WizardContext) {
+    return ctx.scene.leave();
+  }
 }

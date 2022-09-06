@@ -1,5 +1,5 @@
 import { UserEntity } from '../../../modules/user';
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, JoinColumn, ManyToOne, Unique } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { Assignment, AssignmentStatus, AssignmentType } from '../interfaces';
 
 @Entity('assignment')
@@ -29,7 +29,7 @@ export class AssignmentEntity implements Assignment {
   @Column({ type: 'enum', enum: AssignmentType, nullable: false, default: AssignmentType.ASSIGNMENT, name: 'type' })
   type!: AssignmentType;
 
-  @CreateDateColumn({ type: 'timestamp', nullable: false })
+  @Column({ type: 'timestamptz', nullable: false })
   deadline!: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.userSchedules, {

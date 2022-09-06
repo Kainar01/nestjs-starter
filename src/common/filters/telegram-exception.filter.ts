@@ -10,5 +10,6 @@ export class TelegrafExceptionFilter implements ExceptionFilter {
     const ctx = telegrafHost.getContext<BotContext>();
     console.error(exception);
     await ctx.replyWithHTML(`<b>Error</b>: ${exception.message}`);
+    await ctx.scene.leave();
   }
 }
