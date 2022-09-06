@@ -50,4 +50,8 @@ export class BaseScene {
   protected async leaveScene(ctx: Scenes.WizardContext) {
     return ctx.scene.leave();
   }
+
+  protected nextStep(ctx: Scenes.WizardContext) {
+    ctx.wizard.next();
+  }
 }

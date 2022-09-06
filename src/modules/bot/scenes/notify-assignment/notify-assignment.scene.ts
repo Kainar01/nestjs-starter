@@ -28,40 +28,58 @@ export class NotifyAssignmentScene extends BaseScene {
   }
 
   @WizardStep(NOTIFY_ASSIGNMENT_SCENE_STEPS.GET_ASSIGNMENT)
-  public async getAssignmentStep(@Ctx() ctx: Scenes.WizardContext, @CtxUser() user: User): Promise<void> {
-    const assignments = await this.getAssignments(ctx, user);
+  public async getAssignmentStep(
+    @Ctx() ctx: Scenes.WizardContext,
+      @Next() next: () => Promise<void>,
+      @CtxUser() user: User,
+  ): Promise<void> {
+    const isAssignedPassedWithParam = !!this.getAssignmentId(ctx);
 
-    if (isEmpty(assignments)) {
-      const message = this.getMessage('assignments.no-assignments');
-      await ctx.reply(`${message} ${TELEGRAM_EMOJIES.CONFUSED}`);
-      await ctx.scene.leave();
-      return;
+    if (!isAssignedPassedWithParam) {
+      const assignments = await this.getAssignments(ctx, user);
+
+      if (isEmpty(assignments)) {
+        const message = this.getMessage('assignments.no-assignments');
+        await ctx.reply(`${message} ${TELEGRAM_EMOJIES.CONFUSED}`);
+        await ctx.scene.leave();
+        return;
+      }
+
+      const chooseAssignmentMsg = this.getMessage('notification.choose-assignment');
+      const assignmentMsg = this.formatAssignmentsMessage(assignments);
+
+      const assignmentOptions = assignments.map(({ id }: AssignmentFormatted) => ({
+        text: `#${id}`,
+        callback_data: `${NOTIFY_ASSIGNMENT_SCENE_ACTIONS.ASSIGNMENT_CHOOSE}${id}`,
+      }));
+
+      const groupedAssignmentOptions = _.chunk(assignmentOptions, 2);
+      groupedAssignmentOptions.push([
+        { text: this.commonMessages['cancel'], callback_data: NOTIFY_ASSIGNMENT_SCENE_ACTIONS.NOTIFY_CANCEL },
+      ]);
+
+      await ctx.reply(chooseAssignmentMsg);
+      await ctx.reply(assignmentMsg, {
+        parse_mode: 'Markdown',
+        reply_markup: {
+          remove_keyboard: true,
+          one_time_keyboard: true,
+          inline_keyboard: groupedAssignmentOptions,
+        },
+      });
+    } else {
+      await this.runStep(ctx, next, NOTIFY_ASSIGNMENT_SCENE_STEPS.NOTIFICATION_OPTIONS);
     }
-
-    const chooseAssignmentMsg = this.getMessage('notification.choose-assignment');
-    const assignmentMsg = this.formatAssignmentsMessage(assignments);
-
-    const assignmentOptions = assignments.map(({ id }: AssignmentFormatted) => ({
-      text: `#${id}`,
-      callback_data: `${NOTIFY_ASSIGNMENT_SCENE_ACTIONS.ASSIGNMENT_CHOOSE}${id}`,
-    }));
-
-    const groupedAssignmentOptions = _.chunk(assignmentOptions, 2);
-
-    await ctx.reply(chooseAssignmentMsg);
-    await ctx.reply(assignmentMsg, {
-      parse_mode: 'Markdown',
-      reply_markup: {
-        remove_keyboard: true,
-        one_time_keyboard: true,
-        inline_keyboard: groupedAssignmentOptions,
-      },
-    });
   }
 
   @WizardStep(NOTIFY_ASSIGNMENT_SCENE_STEPS.NOTIFICATION_OPTIONS)
   public async notificationOptionsStep(@Ctx() ctx: Scenes.WizardContext): Promise<void> {
     const assignmentId = this.getAssignmentId(ctx);
+
+    if (!assignmentId) {
+      throw new Error('Ассайнмента не существет');
+    }
+
     const assignment = await this.assignmentService.getAssignmentById(assignmentId);
 
     if (!assignment) {
@@ -159,7 +177,7 @@ export class NotifyAssignmentScene extends BaseScene {
     await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
     await ctx.editMessageText(`${callbackMessage} ${TELEGRAM_EMOJIES.CROSS_MARK}`, { parse_mode: 'Markdown' });
 
-    await ctx.scene.leave();
+    await this.leaveScene(ctx);
   }
 
   private formatAssignmentsMessage(assignments: AssignmentFormatted[]) {

@@ -8,20 +8,29 @@ export class UserEntity implements User {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id!: number;
 
-  @Column('varchar', { nullable: false, name: 'chatId' })
+  @Column('int', { nullable: false, name: 'telegram_user_id' })
+  telegramUserId!: number;
+
+  @Column('varchar', { nullable: false, name: 'chat_id' })
   chatId!: string;
 
-  @Column('varchar', { nullable: true, name: 'name' })
-  name!: string | null;
+  @Column('varchar', { nullable: false, name: 'name' })
+  name!: string ;
 
   @Column('varchar', { nullable: true, name: 'username' })
   username!: string | null;
 
+  @Column('varchar', { nullable: true, name: 'moodle_username' })
+  moodleUsername!: string | null;
+
+  @Column('varchar', { nullable: true, name: 'moodle_password' })
+  moodlePassword!: string | null;
+
   @Column({ type: 'enum', enum: UserRole, nullable: true, name: 'role' })
   role!: UserRole | null;
 
-  @Column('varchar', { nullable: true, name: 'password' })
-  password!: string | null;
+  @Column('boolean', { nullable: false, default: false, name: 'verified' })
+  verified!: boolean;
 
   @Column('timestamptz', { nullable: true, name: 'last_assignment_notification' })
   lastAssignmentNotification!: Date | null;

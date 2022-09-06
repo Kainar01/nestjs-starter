@@ -45,6 +45,9 @@ export class UserScheduleService {
         .innerJoin('user', 'u', 'u.id = us.user_id')
         .innerJoin('schedule', 's', 's.id = us.schedule_id')
         .where('s.hour = :hour', { hour })
+        .andWhere('u.verified = true')
+        .andWhere('u.moodle_username is not null')
+        .andWhere('u.moodle_password is not null')
         // last cron has to be smaller than hour cron starts, to avoid duplicate cron jobs
         .andWhere('us.last_cron IS NULL OR us.last_cron < :cronStart', { cronStart }) // us.last_cron IS NULL OR
         .getRawMany<Record<'user_id', number>>()

@@ -29,7 +29,7 @@ export class InitScene extends BaseScene {
 
   @WizardStep(INIT_STEPS.USERNAME)
   public async enterUsername(@Ctx() ctx: Scenes.WizardContext, @CtxUser() user: User): Promise<void> {
-    const username = this.getState(ctx).username || user.username;
+    const username = this.getState(ctx).username || user.moodleUsername;
     if (username) {
       const message = this.getMessage('authentication.set-up-username.change-existing', { username });
 
@@ -71,7 +71,7 @@ export class InitScene extends BaseScene {
 
   @WizardStep(INIT_STEPS.PASSWORD)
   public async enterPassword(@Ctx() ctx: Scenes.WizardContext, @CtxUser() user: User): Promise<void> {
-    const password = this.getState(ctx).password || user.password;
+    const password = this.getState(ctx).password || user.moodlePassword;
     if (password) {
       const message = this.getMessage('authentication.set-up-password.change-existing', { password });
 
@@ -196,7 +196,7 @@ export class InitScene extends BaseScene {
     const { error } = await this.isValidCreds(<string>username, <string>password);
 
     if (!error) {
-      await this.userService.updateUser(user.id, { username, password });
+      await this.userService.updateUser(user.id, { moodleUsername: username, moodlePassword: password });
 
       await ctx.reply(`${credsMsg['saved-credentials']} ${TELEGRAM_EMOJIES.CLOCK}`, { parse_mode: 'Markdown' });
 
@@ -240,8 +240,8 @@ export class InitScene extends BaseScene {
   private getCredentials(ctx: Scenes.WizardContext, user: User): Record<'username' | 'password', string | null> {
     const { username, password } = (<any>ctx).wizard.state;
     return {
-      username: username || user.username,
-      password: password || user.password,
+      username: username || user.moodleUsername,
+      password: password || user.moodlePassword,
     };
   }
 }

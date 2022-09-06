@@ -2,6 +2,7 @@ import { UseFilters, UseGuards } from '@nestjs/common';
 import { I18n, I18nService } from 'nestjs-i18n';
 import { Update, InjectBot, On, Start, Command, Ctx, Action } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
+import type { User as TelegramUser } from 'telegraf/typings/core/types/typegram';
 
 import { TelegrafExceptionFilter } from '@/common/filters';
 import { AssignmentService, AssignmentStatus } from '@/modules/assignment';
@@ -9,7 +10,7 @@ import { AssignmentService, AssignmentStatus } from '@/modules/assignment';
 import { User, UserService } from '../user';
 import { MOODLE_BOT_ACTIONS, MOODLE_BOT_NAME, MOODLE_BOT_SCENES, TELEGRAM_EMOJIES } from './bot.constants';
 import { CtxUser } from './decorators';
-import { BotAdminGuard } from './guards';
+import { BotAdminGuard, BotMoodleAuthGuard, BotNotVerifiedGuard, BotVerifiedGuard } from './guards';
 import { BotCommand, BotContext } from './interfaces';
 
 @Update()
@@ -26,9 +27,10 @@ export class BotUpdate {
     this.handleError();
   }
 
+  @UseGuards(BotVerifiedGuard)
   @Start()
   public async onStart(@Ctx() ctx: BotContext, @CtxUser() user: User) {
-    if (!user.password || !user.username) {
+    if (!user.moodlePassword || !user.moodleUsername) {
       const helloMessage = this.getMessage('bot.hello');
       await ctx.reply(`${helloMessage} ${TELEGRAM_EMOJIES.WINKING}`);
 
@@ -51,11 +53,14 @@ export class BotUpdate {
     return 'Welcome judge';
   }
 
+  @UseGuards(BotVerifiedGuard)
   @Command(BotCommand.INIT)
   public async onInitCommand(@Ctx() ctx: BotContext): Promise<void> {
     await ctx.scene.enter(MOODLE_BOT_SCENES.INIT);
   }
 
+  @UseGuards(BotVerifiedGuard)
+  @UseGuards(BotMoodleAuthGuard)
   @Command(BotCommand.ASSIGNMENTS)
   public async onAssignmentsCommand(@CtxUser() user: User): Promise<string | void> {
     const { error } = this.assignmentService.validateUserLastNotification(user);
@@ -68,14 +73,24 @@ export class BotUpdate {
     return `${message} ${TELEGRAM_EMOJIES.HALO}`;
   }
 
+  @UseGuards(BotVerifiedGuard)
+  @UseGuards(BotMoodleAuthGuard)
   @Command(BotCommand.SCHEDULE)
   public async onScheduleCommand(@Ctx() ctx: BotContext): Promise<string | void> {
     await ctx.scene.enter(MOODLE_BOT_SCENES.SCHEDULE);
   }
 
+  @UseGuards(BotVerifiedGuard)
+  @UseGuards(BotMoodleAuthGuard)
   @Command(BotCommand.NOTIFY_ASSIGNMENT)
   public async onNotifyAssignmentCommand(@Ctx() ctx: BotContext): Promise<string | void> {
     await ctx.scene.enter(MOODLE_BOT_SCENES.NOTIFY_ASSIGNMENT);
+  }
+
+  @UseGuards(BotNotVerifiedGuard)
+  @Command(BotCommand.REQUEST_VERIFY)
+  public async onRequestVerifytCommand(@Ctx() ctx: BotContext): Promise<string | void> {
+    await ctx.scene.enter(MOODLE_BOT_SCENES.REQUEST_VERIFY);
   }
 
   @Action(new RegExp(`${MOODLE_BOT_ACTIONS.ASSIGNMENT_SUBMIT}\\d`))
@@ -114,6 +129,44 @@ export class BotUpdate {
     await ctx.scene.enter(MOODLE_BOT_SCENES.NOTIFY_ASSIGNMENT, { assignmentId });
   }
 
+  @Action(new RegExp(`${MOODLE_BOT_ACTIONS.ADMIN_REQUEST_CONFIRM}\\d`))
+  public async onRequestConfirmAction(@Ctx() ctx: BotContext): Promise<void> {
+    await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
+
+    const actionData = this.getCallbackData(ctx);
+    const requestUserId = Number(actionData.replace(MOODLE_BOT_ACTIONS.ADMIN_REQUEST_CONFIRM, ''));
+
+    const requestUser = await this.userService.findByUserId(requestUserId);
+
+    if (!requestUser) {
+      throw new Error(`Пользователь не существует requestUserId=${requestUserId}`);
+    }
+
+    await this.userService.updateUser(requestUser.id, { verified: true });
+
+    const message = this.getMessage('request-verify.request-accepted');
+
+    await ctx.telegram.sendMessage(requestUser.chatId, `${message}, ${TELEGRAM_EMOJIES.HALO}`);
+  }
+
+  @Action(new RegExp(`${MOODLE_BOT_ACTIONS.ADMIN_REQUEST_DECLINE}\\d`))
+  public async onRequestDeclineAction(@Ctx() ctx: BotContext): Promise<void> {
+    await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
+
+    const actionData = this.getCallbackData(ctx);
+    const requestUserId = Number(actionData.replace(MOODLE_BOT_ACTIONS.ADMIN_REQUEST_DECLINE, ''));
+
+    const requestUser = await this.userService.findByUserId(requestUserId);
+
+    if (!requestUser) {
+      throw new Error(`Пользователь не существует requestUserId=${requestUserId}`);
+    }
+
+    const message = this.getMessage('request-verify.request-declined');
+
+    await ctx.telegram.sendMessage(requestUser.chatId, `${message} ${TELEGRAM_EMOJIES.CONFUSED}`);
+  }
+
   @On('text')
   public onMessage(): string {
     const message = this.getMessage('bot.wish');
@@ -123,13 +176,21 @@ export class BotUpdate {
   private useUserMiddleware(): void {
     const userMiddleware = async (ctx: BotContext, next: () => Promise<void>): Promise<void> => {
       try {
-        const me = await this.bot.telegram.getMe();
         const chatId = ctx?.chat?.id;
         if (chatId) {
+          const { first_name: name, username, id } = this.getTelegramUser(ctx);
+
           let user = await this.userService.findByChatId(chatId.toString());
 
-          if (!user) user = await this.userService.createUser({ chatId: chatId.toString(), name: me.first_name });
-
+          if (!user) {
+            user = await this.userService.createUser({ chatId: chatId.toString(), name, username, telegramUserId: id });
+          } else {
+            const nameChanged = name !== user.name;
+            const usernameChanged = username !== user.username;
+            if (nameChanged || usernameChanged) {
+              await this.userService.updateUser(user.id, { name, username });
+            }
+          }
           ctx.user = user;
         }
       } catch (err) {
@@ -140,6 +201,10 @@ export class BotUpdate {
     };
 
     this.bot.use(userMiddleware);
+  }
+
+  private getTelegramUser(ctx: BotContext): TelegramUser {
+    return <TelegramUser>(ctx.message?.from || ctx.callbackQuery?.from || ctx.from);
   }
 
   private handleError(): void {

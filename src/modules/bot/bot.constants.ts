@@ -4,6 +4,7 @@ export const MOODLE_BOT_SCENES = {
   INIT: 'init',
   SCHEDULE: 'schedule',
   NOTIFY_ASSIGNMENT: 'notify-assignment',
+  REQUEST_VERIFY: 'request-verify',
 };
 
 export const MOODLE_BOT_ACTIONS = {
@@ -11,6 +12,8 @@ export const MOODLE_BOT_ACTIONS = {
   ASSIGNMENT_HIDE: 'assignment:hide:',
   ASSIGNMENT_NOTIFY_OPTIONS: 'assignment:notify-options:',
   ASSIGNMENT_NOTIFY: 'assignment:notify:',
+  ADMIN_REQUEST_CONFIRM: 'admin:request:confirm:',
+  ADMIN_REQUEST_DECLINE: 'admin:request:decline:',
 };
 
 // https://apps.timwhitlock.info/emoji/tables/unicode

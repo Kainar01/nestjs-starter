@@ -9,6 +9,8 @@ export enum BotCommand {
   SCHEDULE = 'schedule',
   ASSIGNMENTS = 'assignments',
   NOTIFY_ASSIGNMENT = 'notifyassignment',
+  REQUEST_VERIFY = 'requestverify',
+  REQUEST_SUPERADMIN = 'requestsuperadmin',
 }
 
 export enum BotAction {

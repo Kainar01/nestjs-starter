@@ -5,7 +5,7 @@ import type { Repository, UpdateResult } from 'typeorm';
 import type { UpdateUserDto } from '../dto';
 import type { CreateUserDto } from '../dto/create-user.dto';
 import { UserEntity } from '../entities';
-import { ScheduleHour, User } from '../interfaces';
+import { ScheduleHour, User, UserRole } from '../interfaces';
 import { UserScheduleService } from './user-schedule.service';
 
 @Injectable()
@@ -21,6 +21,10 @@ export class UserService {
 
   public async findByChatId(chatId: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({ where: { chatId } });
+  }
+
+  public async findSuperAdmin(): Promise<UserEntity | null> {
+    return this.userRepository.findOne({ where: { role: UserRole.SUPERADMIN } });
   }
 
   public async findByUserId(userId: number): Promise<UserEntity | null> {
