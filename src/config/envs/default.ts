@@ -24,6 +24,9 @@ export const config: AppConfig = {
       url: process.env.BOT_MOODLE_URL,
       token: process.env.MOODLE_BOT_TOKEN,
     },
+    auth: {
+      verificationDisabled: <boolean>JSON.parse(process.env.BOT_USER_VERIFICATION_DISABLE),
+    },
   },
   redis: {
     url: process.env.REDIS_URL,

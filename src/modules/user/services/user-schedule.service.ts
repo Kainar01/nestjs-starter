@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import moment from 'moment-timezone';
 import type { EntityManager, Repository } from 'typeorm';
 
+import { ConfigService } from '@/common';
+
 import { ScheduleEntity, UserScheduleEntity } from '../entities';
 import type { Schedule, ScheduleHour, UserSchedule } from '../interfaces';
 
@@ -11,6 +13,7 @@ export class UserScheduleService {
   constructor(
     @InjectRepository(UserScheduleEntity) private userScheduleRepository: Repository<UserScheduleEntity>,
     @InjectRepository(ScheduleEntity) private scheduleRepository: Repository<ScheduleEntity>,
+    private config: ConfigService,
   ) {}
 
   public async getScheduleById(id: number): Promise<Schedule | null> {
@@ -38,21 +41,22 @@ export class UserScheduleService {
     // hour when cron started
     const cronStart = moment().set({ hour, minute: 0, second: 0, milliseconds: 0 }).toDate();
 
-    return (
-      this.userScheduleRepository
-        .createQueryBuilder('us')
-        .select(['distinct u.id as user_id'])
-        .innerJoin('user', 'u', 'u.id = us.user_id')
-        .innerJoin('schedule', 's', 's.id = us.schedule_id')
-        .where('s.hour = :hour', { hour })
-        .andWhere('u.verified = true')
-        .andWhere('u.moodle_username is not null')
-        .andWhere('u.moodle_password is not null')
-        // last cron has to be smaller than hour cron starts, to avoid duplicate cron jobs
-        .andWhere('us.last_cron IS NULL OR us.last_cron < :cronStart', { cronStart }) // us.last_cron IS NULL OR
-        .getRawMany<Record<'user_id', number>>()
-        .then((rows: Record<'user_id', number>[]) => rows.map((row: Record<'user_id', number>) => row.user_id))
-    );
+    let qb = this.userScheduleRepository
+      .createQueryBuilder('us')
+      .select(['distinct u.id as user_id'])
+      .innerJoin('user', 'u', 'u.id = us.user_id')
+      .innerJoin('schedule', 's', 's.id = us.schedule_id')
+      .where('s.hour = :hour', { hour })
+      .andWhere('u.moodle_username is not null')
+      .andWhere('u.moodle_password is not null')
+      // last cron has to be smaller than hour cron starts, to avoid duplicate cron jobs
+      .andWhere('us.last_cron IS NULL OR us.last_cron < :cronStart', { cronStart }); // us.last_cron IS NULL OR
+    // if verification is not disabled, filter verified users to schedule
+    if (!this.config.get('bot.auth.verificationDisabled')) qb = qb.andWhere('u.verified = true');
+
+    return qb
+      .getRawMany<Record<'user_id', number>>()
+      .then((rows: Record<'user_id', number>[]) => rows.map((row: Record<'user_id', number>) => row.user_id));
   }
 
   public async updateLastCron(userIds: number[], newCron: UserSchedule['lastCron'], transactionManager?: EntityManager) {

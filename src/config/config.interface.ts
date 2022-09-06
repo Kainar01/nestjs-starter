@@ -28,6 +28,9 @@ export type AppConfig = {
       url: string;
       token: string;
     };
+    auth: {
+      verificationDisabled: boolean;
+    };
   };
   redis: {
     url: string;
@@ -58,4 +61,5 @@ export type AppEnvVars = {
   BOT_MOODLE_URL: string;
   MOODLE_BOT_TOKEN: string;
   APP_TIMEZONE: string;
+  BOT_USER_VERIFICATION_DISABLE: string;
 };

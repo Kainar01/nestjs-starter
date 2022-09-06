@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsNumberString, IsString, IsUrl, validateSync } from 'class-validator';
+import { IsBooleanString,IsEnum, IsNotEmpty, IsNumberString, IsString, IsUrl, validateSync } from 'class-validator';
 import { AppEnv, AppEnvVars } from './config.interface';
 
 class EnvironmentVariables implements AppEnvVars {
@@ -53,6 +53,10 @@ class EnvironmentVariables implements AppEnvVars {
   @IsNotEmpty()
   BOT_MOODLE_URL!: string;
 
+  @IsBooleanString()
+  @IsNotEmpty()
+  BOT_USER_VERIFICATION_DISABLE!: string;
+
   @IsString()
   @IsNotEmpty()
   APP_TIMEZONE!: string;
@@ -68,5 +72,6 @@ export function validateEnv(config: Record<string, unknown>) {
     console.error('\x1b[31m%s\x1b[0m', errors.toString())
     throw new Error('Env vars missing');
   }
+
   return validatedConfig;
 }

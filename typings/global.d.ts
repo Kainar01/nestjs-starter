@@ -2,8 +2,6 @@ import { Scenes } from 'telegraf';
 
 import type { AppEnvVars } from '@/config';
 
-import { Payload } from '../src/modules/auth';
-
 export declare global {
   type AnyObject = Record<string, unknown>;
 
@@ -16,8 +14,6 @@ export declare global {
     interface Request {
       id: string;
     }
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface
-    interface User extends Payload {}
   }
 
   namespace Telegraf {

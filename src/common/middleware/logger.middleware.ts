@@ -14,8 +14,7 @@ export class LoggerMiddleware implements NestMiddleware {
     // Uncomment when using PinoLogger
     // Logger.setMetadata({ id: req.id });
 
-    const user = req.user?.userId || '';
-    this.logger.log(`${req.method} ${req.originalUrl} - ${req.ip.replace('::ffff:', '')} ${user}`);
+    this.logger.log(`${req.method} ${req.originalUrl} - ${req.ip.replace('::ffff:', '')}`);
 
     return next();
   }

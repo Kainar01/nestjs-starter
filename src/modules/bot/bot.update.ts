@@ -59,8 +59,7 @@ export class BotUpdate {
     await ctx.scene.enter(MOODLE_BOT_SCENES.INIT);
   }
 
-  @UseGuards(BotVerifiedGuard)
-  @UseGuards(BotMoodleAuthGuard)
+  @UseGuards(BotVerifiedGuard, BotMoodleAuthGuard)
   @Command(BotCommand.ASSIGNMENTS)
   public async onAssignmentsCommand(@CtxUser() user: User): Promise<string | void> {
     const { error } = this.assignmentService.validateUserLastNotification(user);
@@ -73,15 +72,13 @@ export class BotUpdate {
     return `${message} ${TELEGRAM_EMOJIES.HALO}`;
   }
 
-  @UseGuards(BotVerifiedGuard)
-  @UseGuards(BotMoodleAuthGuard)
+  @UseGuards(BotVerifiedGuard, BotMoodleAuthGuard)
   @Command(BotCommand.SCHEDULE)
   public async onScheduleCommand(@Ctx() ctx: BotContext): Promise<string | void> {
     await ctx.scene.enter(MOODLE_BOT_SCENES.SCHEDULE);
   }
 
-  @UseGuards(BotVerifiedGuard)
-  @UseGuards(BotMoodleAuthGuard)
+  @UseGuards(BotVerifiedGuard, BotMoodleAuthGuard)
   @Command(BotCommand.NOTIFY_ASSIGNMENT)
   public async onNotifyAssignmentCommand(@Ctx() ctx: BotContext): Promise<string | void> {
     await ctx.scene.enter(MOODLE_BOT_SCENES.NOTIFY_ASSIGNMENT);
