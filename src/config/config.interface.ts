@@ -46,6 +46,7 @@ export type AppEnvVars = {
   DB_PASSWORD: string;
   DB_NAME: string;
   MONGO_DB_URL: string;
+  MONGO_DB_NAME?: string;
   REDIS_URL: string;
   JWT_SECRET: string;
   JWT_REFRESH_SECRET: string;

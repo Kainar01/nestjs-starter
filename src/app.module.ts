@@ -1,12 +1,14 @@
 import { BadRequestException, MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE, RouterModule } from '@nestjs/core';
+import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import type { ValidationError } from 'class-validator';
 
 import { CommonModule, LoggerMiddleware } from './common';
 import { configuration, validateEnv } from './config';
 import { AuthModule } from './modules';
+import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -21,13 +23,20 @@ import { AuthModule } from './modules';
     // https://docs.nestjs.com/techniques/database
     TypeOrmModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
-        ...await config.get('db'),
+        ...(await config.get('db')),
+      }),
+      inject: [ConfigService],
+    }),
+    MongooseModule.forRootAsync({
+      useFactory: async (config: ConfigService) => ({
+        ...{ uri: await config.get('mongodb.url'), autoIndex: false },
       }),
       inject: [ConfigService],
     }),
     // Service Modules
     CommonModule, // Global
     AuthModule,
+    CategoryModule,
     // Module Router
     // https://docs.nestjs.com/recipes/router-module
     RouterModule.register([]),
