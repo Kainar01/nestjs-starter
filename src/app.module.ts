@@ -1,9 +1,19 @@
-import { BadRequestException, MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  CacheModule,
+  CacheStoreFactory,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE, RouterModule } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as redisStore from 'cache-manager-redis-store';
 import type { ValidationError } from 'class-validator';
+import type { ClientOpts } from 'redis';
 
 import { CommonModule, LoggerMiddleware } from './common';
 import { configuration, validateEnv } from './config';
@@ -30,6 +40,15 @@ import { CategoryModule } from './modules/category/category.module';
     MongooseModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         ...{ uri: await config.get('mongodb.url'), autoIndex: false },
+      }),
+      inject: [ConfigService],
+    }),
+    CacheModule.registerAsync<ClientOpts>({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => ({
+        store: <CacheStoreFactory>redisStore,
+        url: await config.get('redis.url'),
       }),
       inject: [ConfigService],
     }),

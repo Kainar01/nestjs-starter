@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Version } from '@nestjs/common';
+import { Body, CacheInterceptor, CacheTTL, Controller, Get, Param, Post, Put, UseInterceptors, Version } from '@nestjs/common';
 
 import type { CategoryTreeItem } from './category.interface';
 import { CategoryService } from './category.service';
@@ -6,20 +6,21 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import type { Category } from './schemas/category.schema';
 
-/**
- * https://docs.nestjs.com/techniques/authentication
- */
 @Controller('category')
 export class CategoryController {
-  constructor(private category: CategoryService) {}
+  constructor(private readonly category: CategoryService) {}
 
   @Get('tree')
+  @CacheTTL(0)
+  @UseInterceptors(CacheInterceptor)
   public async getCategoryTree(): Promise<CategoryTreeItem[]> {
     return this.category.getCategoryTree();
   }
 
-  @Get('tree')
   @Version('2')
+  @Get('tree')
+  @CacheTTL(0)
+  @UseInterceptors(CacheInterceptor)
   public async getCategoryTreeV2(): Promise<CategoryTreeItem[]> {
     return this.category.getCategoryTreeV2();
   }
