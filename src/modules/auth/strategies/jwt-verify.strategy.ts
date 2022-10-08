@@ -5,7 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { ConfigService } from '@/common';
 
-import type { JwtSign, Payload } from '../auth.interface';
+import type { JwtPayload, JwtSign, Payload } from '../auth.interface';
 
 @Injectable()
 export class JwtVerifyStrategy extends PassportStrategy(Strategy, 'jwt-verify') {
@@ -13,17 +13,19 @@ export class JwtVerifyStrategy extends PassportStrategy(Strategy, 'jwt-verify') 
     super({
       ignoreExpiration: true,
       secretOrKey: configService.get('auth.jwtSecret'),
-      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request): string | null => {
-        const data = (<Partial<JwtSign>>request.cookies)?.access_token;
-        if (!data) {
-          return null;
-        }
-        return data;
-      }]),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request): string | null => {
+          const data = (<Partial<JwtSign>>request.cookies)?.access_token;
+          if (!data) {
+            return null;
+          }
+          return data;
+        },
+      ]),
     });
   }
 
-  public validate(payload: any): Payload {
+  public validate(payload: JwtPayload | null): Payload {
     if (payload === null) {
       throw new UnauthorizedException();
     }
