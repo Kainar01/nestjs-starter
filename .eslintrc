@@ -49,7 +49,18 @@
     "no-unused-expressions": "off",
     "object-curly-spacing": "off",
 
-    "import/extensions": ["error", "never"],
+    // https://stackoverflow.com/a/72643821/13237426
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "": "never",
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
     // https://github.com/benmosher/eslint-plugin-import/issues/1753
     "import/named": "off",
     // https://github.com/benmosher/eslint-plugin-import/issues/1453

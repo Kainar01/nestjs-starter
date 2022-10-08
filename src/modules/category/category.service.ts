@@ -6,8 +6,8 @@ import { Model } from 'mongoose';
 import { SchemaName } from '@/common/interfaces/schema';
 
 import type { CategoryTreeItem } from './category.interface';
-import type { CreateCategoryDto } from './dto/create-category.dto';
-import type { UpdateCategoryDto } from './dto/update-category.dto';
+import type { CreateCategoryRequestDto } from './dto/create-category.request.dto';
+import type { UpdateCategoryRequestDto } from './dto/update-category.request.dto';
 import { Category, CategoryDocument } from './schemas/category.schema';
 
 @Injectable()
@@ -114,7 +114,7 @@ export class CategoryService {
     return groupedByParent[parentCategoryKey];
   }
 
-  public async create(dto: CreateCategoryDto): Promise<Category> {
+  public async create(dto: CreateCategoryRequestDto): Promise<Category> {
     if (dto.parent) {
       const parentCategory = await this.categoryModel.findOne({ _id: dto.parent });
 
@@ -129,7 +129,7 @@ export class CategoryService {
     return this.categoryModel.create(dto);
   }
 
-  public async update(id: string, dto: UpdateCategoryDto): Promise<Category | null> {
+  public async update(id: string, dto: UpdateCategoryRequestDto): Promise<Category | null> {
     return this.categoryModel.findOneAndUpdate({ _id: id }, { $set: dto }, { returnDocument: 'after' }).exec();
   }
 }

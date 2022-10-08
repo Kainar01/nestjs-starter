@@ -1,6 +1,7 @@
 import { Logger as NestLogger, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { middleware } from './app.middleware';
 import { AppModule } from './app.module';
@@ -29,6 +30,16 @@ async function bootstrap(): Promise<string> {
 
   // Express Middleware
   middleware(app);
+
+  const config = new DocumentBuilder()
+    .setTitle('Mongodb project')
+    .setDescription('The Estil API')
+    .setVersion('1.0')
+    .addTag('cats')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
 
   await app.listen(process.env.PORT || 3000);
 

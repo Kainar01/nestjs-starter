@@ -1,31 +1,32 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class UpdateCategoryDto {
-  @IsOptional()
+export class CategoryDto {
   @IsString()
-  name?: string;
+  @ApiProperty()
+  name!: string;
+
+  @IsString()
+  @ApiProperty()
+  path!: string;
 
   @IsOptional()
   @IsString()
-  path?: string;
-
-  @IsOptional()
-  @IsString()
+  @ApiProperty()
   description?: string;
 
   @IsOptional()
   @IsString()
+  @ApiProperty()
   image?: string;
 
   @IsOptional()
   @IsNumber()
+  @ApiProperty()
   order?: number;
 
-  @IsOptional()
-  @IsString({each: true})
-  ancestors?: string[];
-
-  @IsOptional()
   @IsString()
+  @IsOptional()
+  @ApiProperty({ type: String, nullable: true })
   parent?: string | null;
 }
