@@ -13,7 +13,7 @@ import { UseCache } from '@/common/decorators/cache.decorator';
 import type { CategoryTreeItem } from './category.interface';
 import { CategoryService } from './category.service';
 import { CategoryTreeResponseDto } from './dto/category-tree.response.dto';
-import { CategoryDto } from './dto/category.dto';
+import { CategoryResponseDto } from './dto/category.response.dto';
 import { CreateCategoryRequestDto } from './dto/create-category.request.dto';
 import { UpdateCategoryRequestDto } from './dto/update-category.request.dto';
 import type { Category } from './schemas/category.schema';
@@ -41,16 +41,16 @@ export class CategoryController {
   }
 
   @ApiOperation({ description: 'Get category flat list' })
-  @ApiOkResponse({ type: CategoryDto, isArray: true })
+  @ApiOkResponse({ type: CategoryResponseDto, isArray: true })
   @Get('all')
-  public async getAllCategories(): Promise<CategoryDto[]> {
+  public async getAllCategories(): Promise<Category[]> {
     return this.category.getAllCategories();
   }
 
   @ApiOperation({ description: 'Create category' })
   @ApiBadRequestResponse()
   @ApiInternalServerErrorResponse()
-  @ApiCreatedResponse({ type: CategoryDto })
+  @ApiCreatedResponse({ type: CategoryResponseDto })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   public async createCategory(@Body() dto: CreateCategoryRequestDto): Promise<Category> {
@@ -58,7 +58,7 @@ export class CategoryController {
   }
 
   @ApiOperation({ description: 'Update category' })
-  @ApiOkResponse({ type: CategoryDto })
+  @ApiOkResponse({ type: CategoryResponseDto })
   @ApiBadRequestResponse()
   @ApiInternalServerErrorResponse()
   @Put(':id')

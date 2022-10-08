@@ -1,7 +1,7 @@
 import { ApiProperty, getSchemaPath } from "@nestjs/swagger";
-import { CategoryDto } from "./category.dto";
+import { CategoryResponseDto } from "./category.response.dto";
 
-export class CategoryTreeResponseDto extends CategoryDto {
+export class CategoryTreeResponseDto extends CategoryResponseDto {
   @ApiProperty({
     allOf: [{ $ref: getSchemaPath(CategoryTreeResponseDto) }],
     type: [CategoryTreeResponseDto],

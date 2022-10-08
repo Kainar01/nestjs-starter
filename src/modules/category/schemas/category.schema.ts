@@ -1,16 +1,16 @@
+import { BaseSchema } from '@/common/base.schema';
 import { SchemaName } from '@/common/interfaces/schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import type { Document } from 'mongoose';
 import mongoose from 'mongoose';
 
-export type CategoryDocument = Category & Document;
-mongoose.set('debug', true);
+export type CategoryDocument = Category & Document<mongoose.Schema.Types.ObjectId>;
 
 @Schema({
   timestamps: true,
-  collection: SchemaName.CATEGORY
+  collection: SchemaName.CATEGORY,
 })
-export class Category {
+export class Category extends BaseSchema {
   @Prop({ required: true, index: true })
   name!: string;
 

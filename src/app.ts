@@ -2,6 +2,7 @@ import { Logger as NestLogger, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import mongoose from 'mongoose';
 
 import { middleware } from './app.middleware';
 import { AppModule } from './app.module';
@@ -40,6 +41,8 @@ async function bootstrap(): Promise<string> {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
+
+  mongoose.set('debug', true);
 
   await app.listen(process.env.PORT || 3000);
 

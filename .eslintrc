@@ -16,7 +16,7 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
-  "ignorePatterns": ["**/node_modules/**", "dist/**", "src/modules/**/*.entity.ts", "src/modules/**/*.schema.ts", "src/modules/**/*.dto.ts", "src/db/**", "src/mongodb/**"],
+  "ignorePatterns": ["**/node_modules/**", "dist/**", "src/modules/**/*.entity.ts", "src/**/*.schema.ts","src/**/*.model.ts", "src/modules/**/*.dto.ts", "src/db/**", "src/mongodb/**"],
   "rules": {
     "class-methods-use-this": "off",
     // https://github.com/typescript-eslint/typescript-eslint/issues/1277

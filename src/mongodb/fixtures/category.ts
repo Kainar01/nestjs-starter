@@ -1,6 +1,6 @@
 import { SchemaName } from '../../common/interfaces/schema';
-import type { Category, CategoryDocument } from '../../modules/category/schemas/category.schema';
 import { Db, ObjectId } from 'mongodb';
+import type { Category } from '@/modules/category/schemas/category.schema';
 
 export type CategoryFixture = {
   name: string;
@@ -10,7 +10,7 @@ export type CategoryFixture = {
 };
 
 export const insertCategoryFixtures = async (db: Db): Promise<any> => {
-  const queue: { subCategories: CategoryFixture[]; parent: (Category & Pick<CategoryDocument, '_id'>) | null }[] = [];
+  const queue: { subCategories: CategoryFixture[]; parent: Category | null }[] = [];
 
   queue.push({ subCategories: categoryFixture, parent: null });
 
@@ -22,7 +22,7 @@ export const insertCategoryFixtures = async (db: Db): Promise<any> => {
       const data = {
         name: subCategory.name,
         path: parent?.path ? `${parent.path}/${subCategory.slug}` : subCategory.slug,
-        parent: parent?._id,
+        parent: parent?._id || null,
         ancestors: parent?._id ? [...parent.ancestors, parent._id] : [],
       };
 

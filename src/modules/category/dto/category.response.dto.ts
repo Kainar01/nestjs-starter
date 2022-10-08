@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsString, IsOptional, IsNumber } from 'class-validator';
 
-export class CategoryDto {
+export class CategoryResponseDto {
+  @ApiProperty()
+  _id!: string;
+
   @IsString()
   @ApiProperty()
   name!: string;
@@ -28,5 +31,8 @@ export class CategoryDto {
   @IsString()
   @IsOptional()
   @ApiProperty({ type: String, nullable: true })
-  parent?: string | null;
+  parent!: string | null;
+
+  @ApiProperty({ type: [String] })
+  ancestors!: string[];
 }

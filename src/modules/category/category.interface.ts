@@ -1,5 +1,5 @@
-import type { CategoryDocument } from './schemas/category.schema';
+import type { Category } from './schemas/category.schema';
 
-export interface CategoryTreeItem extends Pick<CategoryDocument, '_id'> {
+export interface CategoryTreeItem extends Category {
   subCategories: CategoryTreeItem[];
 }

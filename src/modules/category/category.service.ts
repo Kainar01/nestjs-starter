@@ -99,10 +99,9 @@ export class CategoryService {
   public async getCategoryTreeV2(): Promise<CategoryTreeItem[]> {
     // flat list each element with empty subCategories
     const categories = await this.categoryModel.aggregate<CategoryTreeItem>([{ $addFields: { subCategories: [] } }]);
-
     // group by parent id, if parent id is null => map to *parentCategoryKey*
     const parentCategoryKey = 'parent';
-    const groupedByParent = _.groupBy(categories, (category: CategoryDocument) => category.parent ?? parentCategoryKey);
+    const groupedByParent = _.groupBy(categories, (category: CategoryTreeItem) => category.parent ?? parentCategoryKey);
 
     const categoriesById = _.keyBy(categories, '_id');
 
